@@ -1,0 +1,112 @@
+package com.example.ecommerce.service;
+
+
+import com.example.ecommerce.dto.LoginRequest;
+import com.example.ecommerce.dto.LoginResponse;
+import com.example.ecommerce.dto.RegistrationRequest;
+import com.example.ecommerce.entity.ERole;
+import com.example.ecommerce.entity.EmailVerificationToken;
+import com.example.ecommerce.entity.Role;
+import com.example.ecommerce.entity.User;
+import com.example.ecommerce.exception.EmailAlreadyExistException;
+import com.example.ecommerce.exception.EmailAndNicknameAlreadyExistException;
+import com.example.ecommerce.exception.NicknameAlreadyExistException;
+import com.example.ecommerce.repository.RoleRepository;
+import com.example.ecommerce.repository.UserRepository;
+import com.example.ecommerce.security.UserDetailsImpl;
+import com.example.ecommerce.security.jwt.JwtProvider;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
+
+
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+@Service
+public class AuthService {
+    @Autowired
+    PasswordEncoder passwordEncoder;
+    @Autowired
+    RoleRepository roleRepository;
+    @Autowired
+    UserRepository userRepository;
+    @Autowired
+    AuthenticationManager authManager;
+    @Autowired
+    JwtProvider jwtProvider;
+    @Autowired
+    MailService mailService;
+    @Autowired
+    EmailVerificationTokenService emailVerificationTokenService;
+
+    public User registration(RegistrationRequest req) throws EmailAlreadyExistException, NicknameAlreadyExistException, EmailAndNicknameAlreadyExistException {
+        if(userRepository.existsByEmail(req.getEmail())&&!userRepository.existsByNickname(req.getNickname())){
+            throw new EmailAlreadyExistException("email already exist");
+        }
+         if(userRepository.existsByNickname(req.getNickname())&&!userRepository.existsByEmail(req.getEmail())){
+            throw new NicknameAlreadyExistException("nickname already exist");
+        }
+        if(userRepository.existsByNickname(req.getNickname())&&userRepository.existsByEmail(req.getEmail())){
+            throw new EmailAndNicknameAlreadyExistException("email and nickname already exist");
+        }
+        User user = new User(req.getNickname(), req.getEmail(), passwordEncoder.encode(req.getPassword()));
+        Set<String> strRoles = req.getRole();
+        Set<Role> roles = new HashSet<>();
+        if (strRoles == null) {
+            Role userRole = roleRepository.findByRole(ERole.ROLE_USER).orElseThrow(() -> new RuntimeException("Role not found"));
+            roles.add(userRole);
+        } else {
+            strRoles.forEach(role -> {
+                if (role == "admin") {
+                    Role adminRole = roleRepository.findByRole(ERole.ROLE_ADMIN).orElseThrow(() -> new RuntimeException("Role not found"));
+                    roles.add(adminRole);
+                } else {
+                    Role userRole = roleRepository.findByRole(ERole.ROLE_ADMIN).orElseThrow(() -> new RuntimeException("Role not found"));
+                    roles.add(userRole);
+                }
+            });
+        }
+        user.setRoles(roles);
+        user.setDate(new Date());
+        userRepository.save(user);
+        return user;
+
+
+    }
+
+    public LoginResponse signIn(LoginRequest loginRequest) {
+        Authentication authentication = authManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        String token=jwtProvider.generateToken(authentication);
+        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+        List<String> roles = userDetails.getAuthorities().stream()
+                .map(item -> item.getAuthority())
+                .collect(Collectors.toList());
+        return new LoginResponse(token,userDetails.getId(),userDetails.getEmail(),roles);
+    }
+
+    public void restorePassword(String email){
+        User user=userRepository.findByEmail(email).orElseThrow(()->new UsernameNotFoundException("email invalid"));
+        EmailVerificationToken token =emailVerificationTokenService.saveToken(user,emailVerificationTokenService.createToken());
+        mailService.send(email,"Please follow to http://localhost:8080/auth/confirmToken?token="+token.getToken()+" to change the password","Password restore");
+    }
+
+
+
+
+
+
+
+
+
+}
