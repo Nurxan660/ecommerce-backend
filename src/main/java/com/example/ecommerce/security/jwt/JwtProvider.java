@@ -1,9 +1,7 @@
 package com.example.ecommerce.security.jwt;
 
 import com.example.ecommerce.security.UserDetailsImpl;
-import io.jsonwebtoken.JwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,13 +21,12 @@ public class JwtProvider {
 
 
 
-    public String generateToken(Authentication authentication){
-        UserDetailsImpl userPrincipals= (UserDetailsImpl) authentication.getPrincipal();
+    public String generateToken(String email){
 
         return Jwts.builder()
-                .setSubject(userPrincipals.getEmail())
+                .setSubject(email)
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(new Date().getTime()+86400000))
+                .setExpiration(new Date(new Date().getTime()+jwtExpiration))
                 .signWith(SignatureAlgorithm.HS512,jwtSecret)
                 .compact();
     }
@@ -43,11 +40,16 @@ public class JwtProvider {
             Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(jwt);
             return true;
         }
-        catch (JwtException e){
-            log.error("Jwt error "+e.getMessage());
-        }
-        catch (IllegalArgumentException e){
-            log.error("Empty or incorrect argument "+e.getMessage());
+        catch (SignatureException e) {
+            log.error("Invalid JWT signature: {}", e.getMessage());
+        } catch (MalformedJwtException e) {
+            log.error("Invalid JWT token: {}", e.getMessage());
+        } catch (ExpiredJwtException e) {
+            log.error("JWT token is expired: {}", e.getMessage());
+        } catch (UnsupportedJwtException e) {
+            log.error("JWT token is unsupported: {}", e.getMessage());
+        } catch (IllegalArgumentException e) {
+            log.error("JWT claims string is empty: {}", e.getMessage());
         }
         return false;
     }

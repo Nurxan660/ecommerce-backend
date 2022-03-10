@@ -1,13 +1,11 @@
 package com.example.ecommerce.controller;
 
 
-import com.example.ecommerce.dto.LoginRequest;
-import com.example.ecommerce.dto.LoginResponse;
-import com.example.ecommerce.dto.RegistrationRequest;
-import com.example.ecommerce.dto.RestorePasswordRequest;
+import com.example.ecommerce.dto.*;
 import com.example.ecommerce.exception.*;
 import com.example.ecommerce.service.AuthService;
 import com.example.ecommerce.service.EmailVerificationTokenService;
+import com.example.ecommerce.service.RefreshTokenService;
 import com.example.ecommerce.validation.Validation;
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +24,9 @@ public class AuthController {
     AuthService authService;
     @Autowired
     EmailVerificationTokenService emailVerificationTokenService;
+    @Autowired
+    private RefreshTokenService refreshTokenService;
+
 
 
     @PostMapping("/signup")
@@ -56,7 +57,6 @@ public class AuthController {
     public ResponseEntity signIn(@RequestBody LoginRequest loginRequest){
         try {
             LoginResponse loginResponse = authService.signIn(loginRequest);
-
             return ResponseEntity.ok(loginResponse);
 
         }
@@ -65,6 +65,32 @@ public class AuthController {
 
         }
     }
+    @DeleteMapping(value = "/logout")
+    public ResponseEntity logout(@RequestParam Long userId){
+
+            authService.logout(userId);
+            return ResponseEntity.ok("Successfully logout");
+    }
+
+
+
+    @PostMapping(value = "/refreshToken")
+    public ResponseEntity refreshToken(@RequestBody RefreshTokenRequest refreshTokenRequest){
+        try {
+            TokenRefreshResponse tokenRefreshResponse=refreshTokenService.checkExpiration(refreshTokenRequest.getRefreshToken());
+            return ResponseEntity.ok(tokenRefreshResponse);
+
+        }
+        catch(TokenExpiredException e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+        catch(TokenNotFoundException e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+
+
 
     @PostMapping("/restorePassword")
     public ResponseEntity restorePassword(@RequestBody RestorePasswordRequest restorePasswordRequest){

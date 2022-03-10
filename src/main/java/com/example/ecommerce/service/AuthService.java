@@ -4,13 +4,11 @@ package com.example.ecommerce.service;
 import com.example.ecommerce.dto.LoginRequest;
 import com.example.ecommerce.dto.LoginResponse;
 import com.example.ecommerce.dto.RegistrationRequest;
-import com.example.ecommerce.entity.ERole;
-import com.example.ecommerce.entity.EmailVerificationToken;
-import com.example.ecommerce.entity.Role;
-import com.example.ecommerce.entity.User;
+import com.example.ecommerce.entity.*;
 import com.example.ecommerce.exception.EmailAlreadyExistException;
 import com.example.ecommerce.exception.EmailAndNicknameAlreadyExistException;
 import com.example.ecommerce.exception.NicknameAlreadyExistException;
+import com.example.ecommerce.repository.RefreshTokenRepository;
 import com.example.ecommerce.repository.RoleRepository;
 import com.example.ecommerce.repository.UserRepository;
 import com.example.ecommerce.security.UserDetailsImpl;
@@ -25,7 +23,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 
-
+import javax.transaction.Transactional;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -48,6 +46,10 @@ public class AuthService {
     MailService mailService;
     @Autowired
     EmailVerificationTokenService emailVerificationTokenService;
+    @Autowired
+    RefreshTokenService refreshTokenService;
+    @Autowired
+    RefreshTokenRepository refreshTokenRepository;
 
     public User registration(RegistrationRequest req) throws EmailAlreadyExistException, NicknameAlreadyExistException, EmailAndNicknameAlreadyExistException {
         if(userRepository.existsByEmail(req.getEmail())&&!userRepository.existsByNickname(req.getNickname())){
@@ -87,12 +89,19 @@ public class AuthService {
     public LoginResponse signIn(LoginRequest loginRequest) {
         Authentication authentication = authManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        String token=jwtProvider.generateToken(authentication);
+        UserDetailsImpl userPrincipals= (UserDetailsImpl) authentication.getPrincipal();
+        String token=jwtProvider.generateToken(userPrincipals.getEmail());
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
         List<String> roles = userDetails.getAuthorities().stream()
                 .map(item -> item.getAuthority())
                 .collect(Collectors.toList());
-        return new LoginResponse(token,userDetails.getId(),userDetails.getEmail(),roles);
+        RefreshToken refreshToken=refreshTokenService.createRefreshToken(userDetails.getEmail());
+        return new LoginResponse(token,refreshToken.getToken(),userDetails.getId(),userDetails.getEmail(),roles);
+    }
+
+    @Transactional
+    public void logout(Long userId){
+        refreshTokenRepository.deleteByUserId(userId);
     }
 
     public void restorePassword(String email){
