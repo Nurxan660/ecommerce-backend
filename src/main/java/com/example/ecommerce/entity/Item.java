@@ -1,6 +1,7 @@
 package com.example.ecommerce.entity;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 public class Item {
@@ -13,9 +14,11 @@ public class Item {
     private String description;
     @Column(name="item_price",nullable = false)
     private Integer price;
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "category_id")
     private Category category;
+    @OneToMany(mappedBy = "item")
+    private List<Images> images;
     public Item() {
 
     }
@@ -50,5 +53,21 @@ public class Item {
 
     public void setCategory(Category category) {
         this.category = category;
+    }
+
+    public Long getItmId() {
+        return itmId;
+    }
+
+    public void setItmId(Long itmId) {
+        this.itmId = itmId;
+    }
+
+    public List<Images> getImages() {
+        return images;
+    }
+
+    public void setImages(List<Images> images) {
+        this.images = images;
     }
 }
