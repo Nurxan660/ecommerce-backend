@@ -9,8 +9,8 @@ import java.util.Objects;
 @Embeddable
 public class ItemCharacteristicKey implements Serializable {
 
-    private Long itemId;
-    private Long characteristicId;
+    private Long itmId;
+    private Long subCharacteristicId;
     @Column(name="simple_char_index")
     private Long indexOfSimpleChar;
     @Column(name="detail_char_index")
@@ -21,28 +21,28 @@ public class ItemCharacteristicKey implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ItemCharacteristicKey that = (ItemCharacteristicKey) o;
-        return Objects.equals(itemId, that.itemId) && Objects.equals(characteristicId, that.characteristicId);
+        return Objects.equals(itmId, that.itmId) && Objects.equals(subCharacteristicId, that.subCharacteristicId) && Objects.equals(indexOfSimpleChar, that.indexOfSimpleChar) && Objects.equals(indexOfDetailChar, that.indexOfDetailChar);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(itemId, characteristicId);
+        return Objects.hash(itmId, subCharacteristicId, indexOfSimpleChar, indexOfDetailChar);
     }
 
-    public Long getItemId() {
-        return itemId;
+    public Long getItmId() {
+        return itmId;
     }
 
-    public void setItemId(Long itemId) {
-        this.itemId = itemId;
+    public void setItmId(Long itmId) {
+        this.itmId = itmId;
     }
 
-    public Long getCharacteristicId() {
-        return characteristicId;
+    public Long getSubCharacteristicId() {
+        return subCharacteristicId;
     }
 
-    public void setCharacteristicId(Long characteristicId) {
-        this.characteristicId = characteristicId;
+    public void setSubCharacteristicId(Long subCharacteristicId) {
+        this.subCharacteristicId = subCharacteristicId;
     }
 
     public Long getIndexOfSimpleChar() {

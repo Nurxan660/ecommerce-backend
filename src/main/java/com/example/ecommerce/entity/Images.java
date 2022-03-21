@@ -1,5 +1,7 @@
 package com.example.ecommerce.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 
 @Entity
@@ -8,6 +10,7 @@ public class Images {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     private String url;
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name="item_id")
     private Item item;

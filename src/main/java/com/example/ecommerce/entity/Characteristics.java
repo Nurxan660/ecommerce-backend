@@ -1,17 +1,18 @@
 package com.example.ecommerce.entity;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import javax.persistence.*;
+import java.util.List;
+
 @Entity
 public class Characteristics {
         @Id
         @GeneratedValue(strategy = GenerationType.AUTO)
         private Long id;
         private String name;
-        private String subName;
-        private String value;
+        @OneToMany(mappedBy = "characteristics")
+        private List<SubCharacteristics> subCharacteristics;
 
 
         public Long getId() {
@@ -31,23 +32,13 @@ public class Characteristics {
             this.name = name;
         }
 
-        public String getValue() {
-            return value;
-        }
+    public List<SubCharacteristics> getSubCharacteristics() {
+        return subCharacteristics;
+    }
 
-        public void setValue(String value) {
-            this.value = value;
-        }
-
-        public String getSubName() {
-            return subName;
-        }
-
-        public void setSubName(String subName) {
-            this.subName = subName;
-        }
-
-
+    public void setSubCharacteristics(List<SubCharacteristics> subCharacteristics) {
+        this.subCharacteristics = subCharacteristics;
+    }
 }
 
 

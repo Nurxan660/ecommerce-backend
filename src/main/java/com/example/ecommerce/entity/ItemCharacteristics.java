@@ -11,13 +11,13 @@ public class ItemCharacteristics {
     private ItemCharacteristicKey itemCharacteristicKey;
 
     @ManyToOne
-    @JoinColumn(name="item_id")
-    @MapsId("itemId")
+    @JoinColumn(name="itm_id")
+    @MapsId("itmId")
     private Item item;
     @ManyToOne
-    @JoinColumn(name="characteristic_id")
-    @MapsId("characteristicId")
-    private Characteristics characteristics;
+    @JoinColumn(name="sub_characteristic_id")
+    @MapsId("subCharacteristicId")
+    private SubCharacteristics subCharacteristics;
 
 
     public ItemCharacteristicKey getItemCharacteristicKey() {
@@ -36,14 +36,11 @@ public class ItemCharacteristics {
         this.item = item;
     }
 
-    public Characteristics getCharacteristics() {
-        return characteristics;
+    public SubCharacteristics getSubCharacteristics() {
+        return subCharacteristics;
     }
 
-    public void setCharacteristics(Characteristics characteristics) {
-        this.characteristics = characteristics;
+    public void setSubCharacteristics(SubCharacteristics subCharacteristics) {
+        this.subCharacteristics = subCharacteristics;
     }
-
-
-
 }

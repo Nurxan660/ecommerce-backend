@@ -14,6 +14,8 @@ public class Item {
     private String description;
     @Column(name="item_price",nullable = false)
     private Integer price;
+    @Column(name="is_popular")
+    private Boolean isPopular;
     @ManyToOne
     @JoinColumn(name = "category_id")
     private Category category;
@@ -69,5 +71,13 @@ public class Item {
 
     public void setImages(List<Images> images) {
         this.images = images;
+    }
+
+    public Boolean getPopular() {
+        return isPopular;
+    }
+
+    public void setPopular(Boolean popular) {
+        isPopular = popular;
     }
 }
