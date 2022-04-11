@@ -1,6 +1,7 @@
 package com.example.ecommerce.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.persistence.*;
 
@@ -9,6 +10,7 @@ public class Images {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
+    @JsonProperty("urls")
     private String url;
     @JsonIgnore
     @ManyToOne

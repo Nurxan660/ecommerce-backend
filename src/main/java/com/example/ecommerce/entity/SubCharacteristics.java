@@ -9,29 +9,29 @@ public class SubCharacteristics {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
-    private String subName;
+    private Long subId;
+    private String subTitle;
     private String value;
-    @ManyToOne
+    @ManyToOne()
     @JoinColumn(name = "characteristics_id")
     @JsonIgnore
     private Characteristics characteristics;
 
 
     public Long getId() {
-        return id;
+        return subId;
     }
 
     public void setId(Long id) {
-        this.id = id;
+        this.subId = id;
     }
 
-    public String getSubName() {
-        return subName;
+    public String getSubTitle() {
+        return subTitle;
     }
 
-    public void setSubName(String subName) {
-        this.subName = subName;
+    public void setSubTitle(String subTitle) {
+        this.subTitle = subTitle;
     }
 
     public String getValue() {
@@ -49,4 +49,5 @@ public class SubCharacteristics {
     public void setCharacteristics(Characteristics characteristics) {
         this.characteristics = characteristics;
     }
+
 }

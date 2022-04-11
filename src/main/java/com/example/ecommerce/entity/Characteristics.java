@@ -9,36 +9,36 @@ import java.util.List;
 public class Characteristics {
         @Id
         @GeneratedValue(strategy = GenerationType.AUTO)
-        private Long id;
-        private String name;
-        @OneToMany(mappedBy = "characteristics")
-        private List<SubCharacteristics> subCharacteristics;
+        private Long propertiesId;
+        private String propertiesName;
+
 
 
         public Long getId() {
-            return id;
+            return propertiesId;
         }
 
         public void setId(Long id) {
-            this.id = id;
+            this.propertiesId = id;
         }
 
-        public String getName() {
-            return name;
-        }
-
-
-        public void setName(String name) {
-            this.name = name;
-        }
-
-    public List<SubCharacteristics> getSubCharacteristics() {
-        return subCharacteristics;
+    public Long getPropertiesId() {
+        return propertiesId;
     }
 
-    public void setSubCharacteristics(List<SubCharacteristics> subCharacteristics) {
-        this.subCharacteristics = subCharacteristics;
+    public void setPropertiesId(Long propertiesId) {
+        this.propertiesId = propertiesId;
     }
+
+    public String getPropertiesName() {
+        return propertiesName;
+    }
+
+    public void setPropertiesName(String propertiesName) {
+        this.propertiesName = propertiesName;
+    }
+
+
 }
 
 

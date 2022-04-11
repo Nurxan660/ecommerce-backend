@@ -32,7 +32,7 @@ public class CategoryService {
     public List<FilterCharacteristicsResponse> getAllSubCharacteristics(Long id){
         List<FilterCharacteristicsResponse> response=new ArrayList<>();
         List<SubCharacteristicsCategory> subCharacteristics=subCharacteristicsCategoryRepository.findByCategoryId(id);
-        Map<String,List<SubCharacteristicsCategory>> grouped =subCharacteristics.stream().collect(Collectors.groupingBy(d->d.getSubCharacteristics().getSubName()));
+        Map<String,List<SubCharacteristicsCategory>> grouped =subCharacteristics.stream().collect(Collectors.groupingBy(d->d.getSubCharacteristics().getSubTitle()));
         grouped.forEach((k,v)->{
             FilterCharacteristicsResponse temp=new FilterCharacteristicsResponse(k,v);
             response.add(temp);
