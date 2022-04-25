@@ -8,6 +8,7 @@ import com.example.ecommerce.entity.*;
 import com.example.ecommerce.exception.EmailAlreadyExistException;
 import com.example.ecommerce.exception.EmailAndNicknameAlreadyExistException;
 import com.example.ecommerce.exception.NicknameAlreadyExistException;
+import com.example.ecommerce.exception.UserNotFound;
 import com.example.ecommerce.repository.RefreshTokenRepository;
 import com.example.ecommerce.repository.RoleRepository;
 import com.example.ecommerce.repository.UserRepository;
@@ -24,6 +25,7 @@ import org.springframework.stereotype.Service;
 
 
 import javax.transaction.Transactional;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -32,6 +34,8 @@ import java.util.stream.Collectors;
 
 @Service
 public class AuthService {
+    public static final int  MAX_FAILED_ATTEMPTS=3;
+    public static final long LOCK_TIME_DURATION_MIN=2;
     @Autowired
     PasswordEncoder passwordEncoder;
     @Autowired
@@ -86,9 +90,14 @@ public class AuthService {
 
     }
 
+
     public LoginResponse signIn(LoginRequest loginRequest) {
         Authentication authentication = authManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
+        User user=getUser(loginRequest.getEmail());
+        if(user.getFailedAttempt()>0){
+            resetFailedAttempts(user);
+        }
         UserDetailsImpl userPrincipals= (UserDetailsImpl) authentication.getPrincipal();
         String token=jwtProvider.generateToken(userPrincipals.getEmail());
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
@@ -97,6 +106,10 @@ public class AuthService {
                 .collect(Collectors.toList());
         RefreshToken refreshToken=refreshTokenService.createRefreshToken(userDetails.getEmail());
         return new LoginResponse(token,refreshToken.getToken(),userDetails.getId(),userDetails.getEmail(),roles);
+    }
+
+    public User getUser(String email){
+        return userRepository.findByEmail(email).orElseThrow(()->new UserNotFound("user not found"));
     }
 
     @Transactional
@@ -109,6 +122,35 @@ public class AuthService {
         EmailVerificationToken token =emailVerificationTokenService.saveToken(user,emailVerificationTokenService.createToken());
         mailService.send(email,"Please follow to http://localhost:8080/auth/confirmToken?token="+token.getToken()+" to change the password","Password restore");
     }
+
+
+    public void increaseFailedAttempt(User user){
+        int newFailedAttempts=user.getFailedAttempt()+1;
+        user.setFailedAttempt(newFailedAttempts);
+        userRepository.save(user);
+    }
+    public void resetFailedAttempts(User user){
+        user.setFailedAttempt(0);
+        userRepository.save(user);
+    }
+    public void lock(User user){
+        user.setAccountNonLocked(false);
+        user.setLockTime(LocalDateTime.now().plusMinutes(LOCK_TIME_DURATION_MIN));
+        userRepository.save(user);
+    }
+    public boolean unlockWhenTimeExpired(User user){
+        if(user.getLockTime().isBefore(LocalDateTime.now())){
+            user.setAccountNonLocked(true);
+            user.setFailedAttempt(0);
+            user.setLockTime(null);
+            userRepository.save(user);
+            return true;
+        }
+        return false;
+    }
+
+
+
 
 
 

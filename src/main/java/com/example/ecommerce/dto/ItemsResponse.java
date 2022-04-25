@@ -1,17 +1,20 @@
 package com.example.ecommerce.dto;
 
 import com.example.ecommerce.entity.Images;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
 
-public class PopularItemsResponse {
+public class ItemsResponse {
     private Long itmId;
+    @JsonProperty("name")
     private String itemName;
+    @JsonProperty("price")
     private Integer itemPrice;
     private List<Images> images;
 
 
-    public PopularItemsResponse() {
+    public ItemsResponse() {
 
     }
 

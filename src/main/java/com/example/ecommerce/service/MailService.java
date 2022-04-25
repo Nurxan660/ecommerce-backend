@@ -20,6 +20,7 @@ public class MailService {
             MimeMessage mimeMessage=mailSender.createMimeMessage();
             MimeMessageHelper helper=new MimeMessageHelper(mimeMessage,"utf-8");
             helper.setText(emailBody);
+            helper.setFrom("no-reply@bk.com");
             helper.setTo(to);
             helper.setSubject(subject);
             mailSender.send(mimeMessage);

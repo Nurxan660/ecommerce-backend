@@ -18,16 +18,10 @@ public class OrderController {
     @PostMapping("/create/{userId}")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity createOrder(@RequestBody CreateOrder createOrder, @PathVariable Long userId){
-        try {
+
             orderService.createOrder(createOrder,userId);
             return ResponseEntity.ok("Order successfully created");
 
-        }
-        catch(Exception e){
-
-            return ResponseEntity.badRequest().body(e.getMessage());
-
-        }
 
 
     }

@@ -8,7 +8,6 @@ import com.example.ecommerce.repository.ItemCharacteristicsRepository;
 import com.example.ecommerce.repository.ItemRepository;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
-import org.modelmapper.spi.MatchingStrategy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -29,13 +28,13 @@ public class ItemService {
     @Autowired
     private ItemCharacteristicsRepository itemCharacteristicsRepository;
 
-    public List<PopularItemsResponse> getPopularItems(){
+    public List<ItemsResponse> getPopularItems(){
 
         List<Item> item=itemRepository.findByIsPopular(true);
-        List<PopularItemsResponse> popularItemsResponses=item.stream()
-                .map(d->modelMapper.map(d,PopularItemsResponse.class))
+        List<ItemsResponse> itemsRespons =item.stream()
+                .map(d->modelMapper.map(d, ItemsResponse.class))
                 .collect(Collectors.toList());
-        return popularItemsResponses;
+        return itemsRespons;
     }
 
     public ItemsByCategoryResponse getItemsByCategory(Long id,int page,int size){
@@ -49,7 +48,7 @@ public class ItemService {
     public SimpleItemCharacteristicsResponse getItemsWithSimpleProperties(Long id){
         SimpleItemCharacteristicsResponse response=new SimpleItemCharacteristicsResponse();
         List<SubTitleAndValueResponse> subTitleAndValueResponses=new ArrayList<>();
-        List<ItemCharacteristics> properties=itemCharacteristicsRepository.findByItemCharacteristicKeyItmIdAndItemCharacteristicKeyIndexOfSimpleCharNotOrderByItemCharacteristicKeyIndexOfSimpleChar(id, 0L);
+        List<ItemCharacteristics> properties=itemCharacteristicsRepository.findByItemCharacteristicKeyItmIdAndIndexOfSimpleCharNotOrderByIndexOfSimpleChar(id, 0L);
         if(properties.size()!=0) {
             response.setItmId(properties.get(0).getItem().getItmId());
             response.setName(properties.get(0).getItem().getName());
@@ -66,7 +65,7 @@ public class ItemService {
 
     public List<CharacteristicsResponse> getItemsWithDetailProperties(Long id){
         List<CharacteristicsResponse> response=new ArrayList<>();
-        List<ItemCharacteristics> properties=itemCharacteristicsRepository.findByItemCharacteristicKeyItmIdAndItemCharacteristicKeyIndexOfDetailCharNotOrderByItemCharacteristicKeyIndexOfDetailChar(id, 0L);
+        List<ItemCharacteristics> properties=itemCharacteristicsRepository.findByItemCharacteristicKeyItmIdAndIndexOfDetailCharNotOrderByIndexOfDetailChar(id, 0L);
         modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.LOOSE);
         Map<Characteristics,List<ItemCharacteristics>> grouped=properties.stream().collect(Collectors.groupingBy(d->d.getSubCharacteristics().getCharacteristics()));
         grouped.forEach((k,v)->{
@@ -77,6 +76,15 @@ public class ItemService {
         });
         return response;
 
+    }
+
+    public ItemsByFilterResponse getItemsByFilter(ItemsByFilterRequest itemIds,int page,int count,Integer minPrice,Integer maxPrice){
+        modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.LOOSE);
+        Pageable pageable=PageRequest.of(page,count);
+      //Page<ItemCharacteristics> pageObj= itemCharacteristicsRepository.findByItemCharacteristicKeySubCharacteristicIdAllAndItemPriceBetween(pageable,itemIds.getIds(),minPrice,maxPrice);
+        Page<Item> pageObj=itemRepository.findByFilterData(itemIds.getIds(),minPrice,maxPrice,pageable);
+      ItemsByFilterResponse itemsByFilterResponse =modelMapper.map(pageObj,ItemsByFilterResponse.class);
+       return itemsByFilterResponse;
     }
 
 

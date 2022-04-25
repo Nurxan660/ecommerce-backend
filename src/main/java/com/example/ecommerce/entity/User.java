@@ -4,6 +4,7 @@ package com.example.ecommerce.entity;
 import com.sun.istack.NotNull;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -22,6 +23,12 @@ public class User {
     @Column(nullable = false)
     private String password;
     private Date date;
+    @Column(name="account_non_locked")
+    private boolean accountNonLocked=true;
+    @Column(name="failed_attempt")
+    private int failedAttempt;
+    @Column(name="lock_time")
+    private LocalDateTime lockTime;
     @OneToMany(mappedBy = "user")
     private Set<EmailVerificationToken> tokens;
     @ManyToMany(fetch = FetchType.EAGER)
@@ -99,5 +106,27 @@ public class User {
         this.roles = roles;
     }
 
+    public boolean isAccountNonLocked() {
+        return accountNonLocked;
+    }
 
+    public void setAccountNonLocked(boolean accountNonLocked) {
+        this.accountNonLocked = accountNonLocked;
+    }
+
+    public int getFailedAttempt() {
+        return failedAttempt;
+    }
+
+    public void setFailedAttempt(int failedAttempt) {
+        this.failedAttempt = failedAttempt;
+    }
+
+    public LocalDateTime getLockTime() {
+        return lockTime;
+    }
+
+    public void setLockTime(LocalDateTime lockTime) {
+        this.lockTime = lockTime;
+    }
 }

@@ -21,32 +21,21 @@ public class CartController {
     @PostMapping("/add")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity addItem(@RequestBody AddItemToCartRequest req){
-        try {
+
             cartService.addItemToCart(req);
             return ResponseEntity.ok("Item successfully added to cart");
 
-        }
-        catch(Exception e){
 
-            return ResponseEntity.badRequest().body(e.getMessage());
-
-        }
     }
 
 
     @DeleteMapping("/delete/user/{userId}/items/{itemId}")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity deleteItem(@PathVariable Long userId,@PathVariable Long itemId){
-        try {
+
             cartService.deleteItemFromCart(userId,itemId);
             return ResponseEntity.ok("Item successfully deleted");
 
-        }
-        catch(Exception e){
-
-            return ResponseEntity.badRequest().body(e.getMessage());
-
-        }
 
 
     }
@@ -55,16 +44,10 @@ public class CartController {
     @PutMapping("/change/qty/user/{userId}/items/{itemId}")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity updateQty(@RequestBody UpdateQty updateQty, @PathVariable Long userId, @PathVariable Long itemId){
-        try {
+
             cartService.updateQty(updateQty,userId,itemId);
             return ResponseEntity.ok("qty successfully updated");
 
-        }
-        catch(Exception e){
-
-            return ResponseEntity.badRequest().body(e.getMessage());
-
-        }
 
 
     }

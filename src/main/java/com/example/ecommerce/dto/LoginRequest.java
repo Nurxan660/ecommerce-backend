@@ -1,5 +1,8 @@
 package com.example.ecommerce.dto;
 
+import org.springframework.stereotype.Component;
+
+@Component
 public class LoginRequest {
     private String email;
     private String password;
@@ -10,5 +13,13 @@ public class LoginRequest {
 
     public String getPassword() {
         return password;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 }

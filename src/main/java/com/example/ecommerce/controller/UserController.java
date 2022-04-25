@@ -1,6 +1,7 @@
 package com.example.ecommerce.controller;
 
 
+import com.example.ecommerce.dto.ResponseMessage;
 import com.example.ecommerce.dto.UpdateUserRequest;
 import com.example.ecommerce.exception.UserNotFound;
 import com.example.ecommerce.service.UserService;
@@ -21,13 +22,8 @@ public class UserController {
     @PutMapping("/update/{id}")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity update(@PathVariable Long id, @RequestBody UpdateUserRequest updateUserRequest){
-        try{
-            userService.update(id, updateUserRequest);
-            return ResponseEntity.ok("User updated");
-        }
-        catch (UserNotFound ex){
-            return ResponseEntity.badRequest().body(ex.getMessage());
-        }
 
+            userService.update(id, updateUserRequest);
+            return ResponseEntity.ok(new ResponseMessage("successfully updated"));
     }
     }

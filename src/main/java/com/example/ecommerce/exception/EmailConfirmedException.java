@@ -1,6 +1,6 @@
 package com.example.ecommerce.exception;
 
-public class EmailConfirmedException extends Exception{
+public class EmailConfirmedException extends RuntimeException{
     public EmailConfirmedException(String message) {
         super(message);
     }

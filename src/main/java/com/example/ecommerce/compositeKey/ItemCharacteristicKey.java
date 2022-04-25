@@ -11,22 +11,25 @@ public class ItemCharacteristicKey implements Serializable {
 
     private Long itmId;
     private Long subCharacteristicId;
-    @Column(name="simple_char_index")
-    private Long indexOfSimpleChar;
-    @Column(name="detail_char_index")
-    private Long indexOfDetailChar;
+
+
+    public ItemCharacteristicKey(Long itmId) {
+        this.itmId = itmId;
+    }
+    public ItemCharacteristicKey() {
+    }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ItemCharacteristicKey that = (ItemCharacteristicKey) o;
-        return Objects.equals(itmId, that.itmId) && Objects.equals(subCharacteristicId, that.subCharacteristicId) && Objects.equals(indexOfSimpleChar, that.indexOfSimpleChar) && Objects.equals(indexOfDetailChar, that.indexOfDetailChar);
+        return Objects.equals(itmId, that.itmId) && Objects.equals(subCharacteristicId, that.subCharacteristicId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(itmId, subCharacteristicId, indexOfSimpleChar, indexOfDetailChar);
+        return Objects.hash(itmId, subCharacteristicId);
     }
 
     public Long getItmId() {
@@ -45,19 +48,5 @@ public class ItemCharacteristicKey implements Serializable {
         this.subCharacteristicId = subCharacteristicId;
     }
 
-    public Long getIndexOfSimpleChar() {
-        return indexOfSimpleChar;
-    }
 
-    public void setIndexOfSimpleChar(Long indexOfSimpleChar) {
-        this.indexOfSimpleChar = indexOfSimpleChar;
-    }
-
-    public Long getIndexOfDetailChar() {
-        return indexOfDetailChar;
-    }
-
-    public void setIndexOfDetailChar(Long indexOfDetailChar) {
-        this.indexOfDetailChar = indexOfDetailChar;
-    }
 }

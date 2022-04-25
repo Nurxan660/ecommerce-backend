@@ -1,13 +1,8 @@
 package com.example.ecommerce.controller;
 
-import com.example.ecommerce.dto.CharacteristicsResponse;
-import com.example.ecommerce.dto.ItemsByCategoryResponse;
-import com.example.ecommerce.dto.PopularItemsResponse;
-import com.example.ecommerce.dto.SimpleItemCharacteristicsResponse;
-import com.example.ecommerce.entity.Item;
+import com.example.ecommerce.dto.*;
 import com.example.ecommerce.service.ItemService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,13 +19,12 @@ public class ItemController {
 
     @GetMapping("/getPopularItems")
     public ResponseEntity getPopularItems(){
-        List<PopularItemsResponse> popularItemsResponses=itemService.getPopularItems();
-        return ResponseEntity.ok(popularItemsResponses);
+        List<ItemsResponse> itemsRespons =itemService.getPopularItems();
+        return ResponseEntity.ok(itemsRespons);
     }
 
     @GetMapping("/get/itemsByCategory")
     public ResponseEntity getItems(@RequestParam Long id,@RequestParam int page,@RequestParam int size){
-        //List<ItemsByCategoryResponse> responses=itemService.getItemsByCategory(id,page,size);
         ItemsByCategoryResponse responses=itemService.getItemsByCategory(id,page,size);
         return ResponseEntity.ok(responses);
     }
@@ -46,6 +40,14 @@ public class ItemController {
         List<CharacteristicsResponse> response=itemService.getItemsWithDetailProperties(id);
         return ResponseEntity.ok(response);
     }
+
+    @PostMapping("/get/itemsByFilter")
+    public ResponseEntity getItemsByFilter(@RequestBody ItemsByFilterRequest ids,@RequestParam int page,@RequestParam int size,@RequestParam Integer minPrice,@RequestParam Integer maxPrice ){
+        ItemsByFilterResponse response=itemService.getItemsByFilter(ids,page,size,minPrice,maxPrice);
+        return ResponseEntity.ok(response);
+    }
+
+
 
 
 
