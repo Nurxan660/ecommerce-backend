@@ -5,6 +5,7 @@ import com.example.ecommerce.dto.LoginRequest;
 import com.example.ecommerce.dto.LoginResponse;
 import com.example.ecommerce.dto.RegistrationRequest;
 import com.example.ecommerce.entity.*;
+import com.example.ecommerce.entity.enums.ERole;
 import com.example.ecommerce.exception.EmailAlreadyExistException;
 import com.example.ecommerce.exception.EmailAndNicknameAlreadyExistException;
 import com.example.ecommerce.exception.NicknameAlreadyExistException;

@@ -38,7 +38,7 @@ public class RefreshTokenService {
     public TokenRefreshResponse checkExpiration(String token) throws TokenExpiredException {
         RefreshToken refreshToken=refreshTokenRepository.findByToken(token).orElseThrow(()->new TokenNotFoundException("token not found"));
         if(refreshToken.getExpiredDate().isBefore(LocalDateTime.now())){
-            throw new TokenExpiredException("refresh token expired , please sign in ");
+            throw new TokenExpiredException("refresh token expired , please sign in");
         }
         String newRefreshToken=generateRefreshToken();
         refreshToken.setToken(newRefreshToken);

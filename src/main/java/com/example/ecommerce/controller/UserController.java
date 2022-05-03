@@ -1,6 +1,7 @@
 package com.example.ecommerce.controller;
 
 
+import com.example.ecommerce.dto.ChangeAddressRequest;
 import com.example.ecommerce.dto.ResponseMessage;
 import com.example.ecommerce.dto.UpdateUserRequest;
 import com.example.ecommerce.exception.UserNotFound;
@@ -26,4 +27,18 @@ public class UserController {
             userService.update(id, updateUserRequest);
             return ResponseEntity.ok(new ResponseMessage("successfully updated"));
     }
+
+    @GetMapping("/get/address/{id}")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity update(@PathVariable Long id){
+        return ResponseEntity.ok(userService.getUserAddress(id));
     }
+
+
+    @PutMapping("/change/address/{id}")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity update(@PathVariable Long id, @RequestBody ChangeAddressRequest req){
+        userService.changeUserAddress(req,id);
+        return ResponseEntity.ok(new ResponseMessage("Address successfully has changed"));
+    }
+}

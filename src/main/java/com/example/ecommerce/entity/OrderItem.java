@@ -1,5 +1,7 @@
 package com.example.ecommerce.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 
 @Entity
@@ -12,6 +14,7 @@ public class OrderItem {
     @JoinColumn(name = "item_id")
     private Item item;
     @ManyToOne()
+    @JsonIgnore
     @JoinColumn(name = "order_id",nullable = false)
     private Order order;
     @Column(nullable = false)

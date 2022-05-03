@@ -8,7 +8,7 @@ public class CartItem {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+    private Long cartItemId;
     @Column(nullable = false)
     private Integer qty;
     @ManyToOne()
@@ -54,5 +54,13 @@ public class CartItem {
 
     public void setQty(Integer qty) {
         this.qty = qty;
+    }
+
+    public Long getCartItemId() {
+        return cartItemId;
+    }
+
+    public void setCartItemId(Long cartItemId) {
+        this.cartItemId = cartItemId;
     }
 }

@@ -1,5 +1,9 @@
 package com.example.ecommerce.entity;
 
+import com.example.ecommerce.entity.enums.OrderStatus;
+import com.example.ecommerce.entity.enums.PaymentType;
+import org.springframework.core.OrderComparator;
+
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -16,6 +20,12 @@ public class Order {
     private Integer total;
     @Column(nullable = false)
     private LocalDateTime createdAt;
+    @Column(nullable = false,name="status")
+    @Enumerated(EnumType.STRING)
+    private OrderStatus status;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false,name="payment_type")
+    private PaymentType paymentType;
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "user_address_id",nullable = false)
     private UserAddress userAddress;
@@ -58,5 +68,29 @@ public class Order {
 
     public void setOrderItems(List<OrderItem> orderItems) {
         this.orderItems = orderItems;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public OrderStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(OrderStatus status) {
+        this.status = status;
+    }
+
+    public PaymentType getPaymentType() {
+        return paymentType;
+    }
+
+    public void setPaymentType(PaymentType paymentType) {
+        this.paymentType = paymentType;
     }
 }

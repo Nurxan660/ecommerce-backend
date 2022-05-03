@@ -10,7 +10,7 @@ import java.util.Optional;
 public interface CartItemRepository extends CrudRepository<CartItem,Long> {
     Optional<CartItem> findByCartUserIdAndItemItmId(Long id, Long itmId);
     void deleteByItemItmIdAndCartUserId(Long itmId,Long id);
-    List<CartItem> findAllByCartUserId(Long id);
+    List<CartItem> findAllByCartUserIdOrderByItemItmId(Long id);
     Boolean existsByCartUserId(Long id);
 
 

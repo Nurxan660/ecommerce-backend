@@ -1,5 +1,7 @@
 package com.example.ecommerce.entity;
 
+import com.example.ecommerce.entity.enums.ERole;
+
 import javax.persistence.*;
 
 @Entity

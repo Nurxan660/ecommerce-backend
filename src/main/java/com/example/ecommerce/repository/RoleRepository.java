@@ -1,7 +1,7 @@
 package com.example.ecommerce.repository;
 
 
-import com.example.ecommerce.entity.ERole;
+import com.example.ecommerce.entity.enums.ERole;
 import com.example.ecommerce.entity.Role;
 import org.springframework.data.repository.CrudRepository;
 

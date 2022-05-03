@@ -1,26 +1,10 @@
-package com.example.ecommerce.entity;
+package com.example.ecommerce.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
-import javax.persistence.*;
-
-@Entity
-public class UserAddress {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
-    @Column
+public class ChangeAddressRequest {
     private String street;
     private String homeNumber;
     private String apartment;
     private String floor;
-    @OneToOne
-    @JsonIgnore
-    @JoinColumn(name = "user_id",nullable = false,unique = true)
-    private User user;
-    public UserAddress () {
-
-    }
 
     public String getStreet() {
         return street;
@@ -52,13 +36,5 @@ public class UserAddress {
 
     public void setFloor(String floor) {
         this.floor = floor;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
     }
 }

@@ -9,15 +9,18 @@ import com.example.ecommerce.repository.UserRepository;
 import com.example.ecommerce.requestBody.LoginBody;
 import com.example.ecommerce.service.AuthService;
 import com.example.ecommerce.service.UserService;
+import io.jsonwebtoken.ExpiredJwtException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.context.request.WebRequest;
 
 import javax.servlet.http.HttpServletRequest;
@@ -66,13 +69,28 @@ public class CustomAdvice {
     @ExceptionHandler({TokenExpiredException.class,TokenNotFoundException.class,EmailConfirmedException.class})
     public ResponseEntity<ResponseMessage> handleRefreshTokenException(RuntimeException e){
         ResponseMessage exception=new ResponseMessage(e.getMessage());
-        return ResponseEntity.status(401).body(exception);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exception);
     }
 
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<ResponseMessage> handleAccessDeniedExceptionException(){
         return ResponseEntity.status(403).body(new ResponseMessage("You don't have access to this resourse"));
     }
+    @ExceptionHandler(CartItemException.class)
+    public ResponseEntity<ResponseMessage> handleAccessDeniedExceptionException(CartItemException e){
+        return ResponseEntity.status(400).body(new ResponseMessage(e.getMessage()));
+    }
+
+    @ExceptionHandler(AddressNotFoundException.class)
+    public ResponseEntity<ResponseMessage> handleAccessDeniedExceptionException(AddressNotFoundException e){
+        return ResponseEntity.status(400).body(new ResponseMessage(e.getMessage()));
+    }
+
+
+
+
+
+
 
 
 }

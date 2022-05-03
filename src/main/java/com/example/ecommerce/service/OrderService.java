@@ -2,6 +2,9 @@ package com.example.ecommerce.service;
 
 import com.example.ecommerce.dto.CreateOrder;
 import com.example.ecommerce.entity.*;
+import com.example.ecommerce.entity.enums.OrderStatus;
+import com.example.ecommerce.entity.enums.PaymentType;
+import com.example.ecommerce.exception.CartItemException;
 import com.example.ecommerce.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,11 +27,13 @@ public class OrderService {
     private CartItemRepository cartItemRepository;
     @Autowired
     private UserAddressRepository userAddressRepository;
+    @Autowired
+    private MailService mailService;
     
     @Transactional
     public Order createOrder(CreateOrder createOrder, Long userId) {
         List<OrderItem> orderItemList=new ArrayList<>();
-        List<CartItem> cartItem=cartItemRepository.findAllByCartUserId(userId);
+        List<CartItem> cartItem=cartItemRepository.findAllByCartUserIdOrderByItemItmId(userId);
         User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("usr not found"));
         Order order = new Order();
         Optional<UserAddress> optUserAddress=userAddressRepository.findByUserId(userId);
@@ -45,6 +50,9 @@ public class OrderService {
             UserAddress userAddress = optUserAddress.get();
             order.setUserAddress(userAddress);
         }
+        if(cartItem.size()==0){
+            throw new CartItemException("cart cannot be empty");
+        }
         cartItem.stream().forEach(item->{
             OrderItem orderItem=new OrderItem();
             orderItem.setItem(item.getItem());
@@ -53,17 +61,37 @@ public class OrderService {
             orderItemList.add(orderItem);
         });
         order.setOrderItems(orderItemList);
-        order.setTotal(calculateTotal(userId));
+        order.setTotal(createOrder.getTotal());
         order.setCreatedAt(LocalDateTime.now());
-         orderRepository.save(order);
+        order.setStatus(OrderStatus.IN_PROCESSING);
+        if (createOrder.getPaymentType().equals("cash to courier")) {
+            order.setPaymentType(PaymentType.CASH_TO_COURIER);
+        } else {
+            order.setPaymentType(PaymentType.CARD_TO_COURIER);
+        }
+        orderRepository.save(order);
          cartRepository.deleteByUserId(userId);
          return order;
     }
 
-    public Integer calculateTotal(Long userId) {
-        List<CartItem> cartItems = cartItemRepository.findAllByCartUserId(userId);
-        Integer sum = cartItems.stream().mapToInt(cartItem -> cartItem.getItem().getPrice()*cartItem.getQty()).sum();
-        return sum;
 
+
+    public void createEmailOrder(String email,Order order){
+        final String[] orderDetail = {"Your order:\n"};
+        order.getOrderItems().forEach((d)->{
+            orderDetail[0]+=d.getItem().getName()+" "+"Количество: "+d.getQty()+","+"\n";
+        });
+
+        orderDetail[0]+="Total: "+order.getTotal()+"\n"+
+                "Address: "+order.getUserAddress().getStreet()+" "+order.getUserAddress().getHomeNumber()
+                +" "+"apartment: "+order.getUserAddress().getApartment()+" "+"floor: "+order.getUserAddress().getFloor()+"\n"+
+                "Thanks for order!\n" +
+                "You can see the status of your order in your personal account";
+        mailService.send(email,orderDetail[0],"Your order");
+    }
+
+    public List<Order> getOrders(Long id){
+        List<Order> orders =orderRepository.findByUserAddressUserId(id);
+        return orders;
     }
 }
